@@ -1,0 +1,33 @@
+{
+  "name": "server.js",
+  "version": "1.0.0",
+  "main": "local-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mishana2007/cr.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mishana2007/cr/issues"
+  },
+  "homepage": "https://github.com/Mishana2007/cr#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "http": "^0.0.1-security",
+    "node-telegram-bot-api": "^0.67.0",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.3",
+    "sqlite3": "^5.1.7",
+    "useragent": "^2.3.0",
+    "ws": "^8.19.0"
+  },
+  "description": ""
+}

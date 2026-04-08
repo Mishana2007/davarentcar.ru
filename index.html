@@ -1,0 +1,3777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>DAVA RENT CAR | Премиальная аренда авто в Абхазии</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        /* ========== RESET & BASE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0A0A0A;
+            --primary-gold: #D4AF37;
+            --primary-gold-light: #F4E4A6;
+            --secondary-dark: #1A1A1A;
+            --text-light: #FFFFFF;
+            --text-gray: #B0B0B0;
+            --text-dark: #333333;
+            --accent-red: #C41E3A;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --chat-primary: #0088cc;
+            --chat-secondary: #34AADF;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        section {
+            padding: 100px 0;
+        }
+
+        .gold-text {
+            color: var(--primary-gold);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--primary-gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            height: 65px;
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 5px 0;
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            height: 45px;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--text-light), var(--primary-gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .nav-desktop {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .nav-desktop a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+
+        .nav-desktop a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-desktop a:hover::after,
+        .nav-desktop a.active::after {
+            width: 100%;
+        }
+
+        .nav-desktop a.active {
+            color: var(--primary-gold);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-actions .btn-primary {
+            padding: 10px 20px;
+            font-size: 13px;
+        }
+
+        .phone-link {
+            display: none;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            margin-right: max(-8px, calc(env(safe-area-inset-right, 0px) - 8px));
+            transition: var(--transition);
+        }
+
+        .mobile-toggle:hover {
+            color: var(--primary-gold);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 120px;
+            background: linear-gradient(135deg, rgba(10,10,10,0.9) 0%, rgba(26,26,26,0.7) 100%);
+            overflow: hidden;
+            margin-top: 0;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            opacity: 0.3;
+            z-index: -1;
+            animation: heroBgShift 20s infinite alternate;
+        }
+
+        @keyframes heroBgShift {
+            0% {
+                transform: scale(1) translateX(0);
+            }
+            100% {
+                transform: scale(1.05) translateX(10px);
+            }
+        }
+
+        .hero-content {
+            max-width: 650px;
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .hero-title {
+            font-size: 64px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            max-width: 550px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            display: block;
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== WHY US ========== */
+        .why-us {
+            background: var(--secondary-dark);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-subtitle {
+            color: var(--primary-gold);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 48px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .section-description {
+            color: var(--text-gray);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .benefit-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .benefit-card:nth-child(1) { animation-delay: 0.1s; }
+        .benefit-card:nth-child(2) { animation-delay: 0.2s; }
+        .benefit-card:nth-child(3) { animation-delay: 0.3s; }
+        .benefit-card:nth-child(4) { animation-delay: 0.4s; }
+        .benefit-card:nth-child(5) { animation-delay: 0.5s; }
+        .benefit-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-gold);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 32px;
+            color: var(--primary-gold);
+            transition: var(--transition);
+        }
+
+        .benefit-card:hover .benefit-icon {
+            background: rgba(212, 175, 55, 0.2);
+            transform: rotateY(180deg);
+        }
+
+        .benefit-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .benefit-desc {
+            color: var(--text-gray);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* ========== CARS SECTION ========== */
+        .cars-section {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+            position: relative;
+            padding: 120px 0;
+        }
+
+        .cars-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--secondary-dark), transparent);
+            z-index: 1;
+        }
+        
+        .cars-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, var(--secondary-dark), transparent);
+            z-index: 1;
+        }
+
+        .cars-filter {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            border-color: var(--primary-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(212, 175, 55, 0.2);
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .car-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .car-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-gold);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .car-image-container {
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+            position: relative;
+            background: #0A0A0A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .car-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px;
+        }
+
+        .car-card:hover .car-image {
+            transform: scale(1.05);
+        }
+
+        .car-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 2.6em;
+        }
+
+        .car-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .car-spec {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .car-spec i {
+            color: var(--primary-gold);
+            width: 16px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .car-spec span {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .car-spec-label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-gray);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .car-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .car-price {
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+
+        .price-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .price-period {
+            color: var(--text-gray);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .car-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-details {
+            background: transparent;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            height: 36px;
+            min-width: 120px;
+            white-space: nowrap;
+        }
+
+        .btn-details:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            letter-spacing: 0.3px;
+            height: 36px;
+            min-width: 120px;
+            white-space: nowrap;
+        }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        /* ========== PROCESS ========== */
+        .process {
+            background: var(--primary-dark);
+            position: relative;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 70px;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .step:nth-child(1) { animation-delay: 0.1s; }
+        .step:nth-child(2) { animation-delay: 0.2s; }
+        .step:nth-child(3) { animation-delay: 0.3s; }
+        .step:nth-child(4) { animation-delay: 0.4s; }
+
+        .step:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-gold);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            font-family: 'Playfair Display', serif;
+            transition: var(--transition);
+        }
+
+        .step:hover .step-number {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .step-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .step-desc {
+            color: var(--text-gray);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ========== CTA ========== */
+        .cta {
+            background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(26,26,26,0.9) 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            opacity: 0.2;
+            z-index: -1;
+            animation: zoomInOut 20s infinite alternate;
+        }
+
+        @keyframes zoomInOut {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .cta-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .cta-subtitle {
+            color: var(--text-gray);
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        /* ========== INVESTORS SECTION ========== */
+        .investors {
+            background: var(--primary-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investors::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.05));
+            z-index: 1;
+        }
+
+        .investor-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .investor-text {
+            padding-right: 40px;
+        }
+
+        .investor-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .investor-stat {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .investor-stat:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-gold);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .investor-stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .investor-stat-label {
+            color: var(--text-gray);
+            font-size: 13px;
+        }
+
+        .investor-image {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .investor-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .investor-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: #0A0A0A;
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--text-light), var(--primary-gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .footer-desc {
+            color: var(--text-gray);
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .footer-title {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: var(--text-light);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 15px;
+            position: relative;
+            padding-left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-gold);
+            padding-left: 8px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            color: var(--text-gray);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .contact-item i {
+            color: var(--primary-gold);
+            width: 20px;
+            margin-top: 2px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--primary-gold);
+            color: var(--primary-dark);
+            transform: translateY(-3px) rotate(5deg);
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        /* ========== MODALS ========== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--secondary-dark);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--glass-border);
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 30px 30px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+        }
+
+
+        select.form-select,
+        select.chat-field-input {
+            color-scheme: light;
+        }
+
+        .form-select option {
+            color: #111111;
+            background: #ffffff;
+        }
+
+        .chat-field-input option {
+            color: #111111;
+            background: #ffffff;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-error.active {
+            display: block;
+        }
+
+        .form-success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-success.active {
+            display: block;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        /* ========== LOADING ANIMATION ========== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-gold);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== CHAT WIDGET ========== */
+        .chat-widget-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2147483646;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            width: auto;
+            height: auto;
+            pointer-events: none;
+        }
+
+        /* Разрешаем события только для элементов чата */
+        .chat-widget-container * {
+            pointer-events: auto;
+        }
+
+        .chat-widget {
+            width: 420px;
+            max-width: 90vw;
+            height: 550px;
+            background: var(--secondary-dark);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+        }
+
+        .chat-widget.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            padding: 20px;
+            color: var(--primary-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .chat-header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .chat-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .chat-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            font-size: 20px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--primary-dark);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            animation: messageSlide 0.3s ease-out;
+            word-wrap: break-word;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            text-align: left;
+        }
+
+        .chat-input-container {
+            padding: 15px;
+            background: var(--secondary-dark);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chat-name-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-name-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            resize: none;
+            min-height: 44px;
+            max-height: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+        }
+
+        .chat-send-btn {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ========== CHAT ROBOT ========== */
+        .chat-robot-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: var(--transition);
+            position: relative;
+            margin-top: 15px;
+            animation: robotFloat 3s ease-in-out infinite;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+        }
+
+        @keyframes robotFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-robot-button:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            border-color: var(--primary-gold);
+        }
+
+        .chat-robot-icon {
+            font-size: 36px;
+            color: var(--primary-gold);
+        }
+
+        .chat-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            z-index: 2;
+        }
+
+        /* ========== CHAT MANAGER MESSAGE ========== */
+        .chat-manager-message {
+            position: absolute;
+            bottom: 110px;
+            right: 0;
+            background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+            color: var(--primary-dark);
+            padding: 12px 15px;
+            border-radius: 12px;
+            width: 260px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 9999;
+            animation: fadeInUp 0.5s ease-out;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .chat-manager-message.active {
+            display: block;
+        }
+
+        .chat-manager-content {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .chat-manager-text {
+            flex: 1;
+        }
+
+        .chat-manager-close {
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            font-size: 12px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .chat-manager-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: rotate(90deg);
+        }
+
+        /* ========== CHAT STATUS ========== */
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            margin-top: 5px;
+            color: var(--text-gray);
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            display: inline-block;
+        }
+        
+        .status-indicator.offline {
+            background: #FF4757;
+        }
+
+        .chat-typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            align-self: flex-start;
+            width: 60px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--text-gray);
+            border-radius: 50%;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+
+        .chat-typing-indicator span:nth-child(1) { animation-delay: -0.3s; }
+        .chat-typing-indicator span:nth-child(2) { animation-delay: -0.15s; }
+        .chat-typing-indicator span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        /* ========== МОБИЛЬНАЯ ВЕРСИЯ ========== */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 0 30px;
+            }
+            
+            .hero-title {
+                font-size: 56px;
+            }
+            
+            .investor-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .investor-text {
+                padding-right: 0;
+            }
+            
+            .cars-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            
+            .car-image-container {
+                height: 220px;
+            }
+            
+            .chat-widget {
+                width: 380px;
+                height: 500px;
+            }
+            
+            .chat-manager-message {
+                width: 240px;
+                font-size: 12px;
+                bottom: 100px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .nav-desktop {
+                display: none;
+            }
+            
+            .mobile-toggle {
+                display: flex;
+            }
+            
+            .hero::before {
+                width: 100%;
+                opacity: 0.2;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .investor-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .cars-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 20px;
+            }
+            
+            .car-image-container {
+                height: 200px;
+            }
+            
+            .car-title {
+                font-size: 18px;
+                height: 2.4em;
+            }
+            
+            .car-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .car-footer {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            
+            .car-price {
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .btn-details,
+            .btn-book {
+                width: 100%;
+                justify-content: center;
+                min-width: unset;
+            }
+            
+            .chat-widget-container {
+                bottom: max(20px, env(safe-area-inset-bottom, 20px));
+                right: max(20px, env(safe-area-inset-right, 20px));
+            }
+            
+            .chat-robot-button {
+                width: 72px;
+                height: 72px;
+                position: fixed;
+                bottom: max(20px, env(safe-area-inset-bottom, 20px));
+                right: max(20px, env(safe-area-inset-right, 20px));
+                margin-top: 0;
+                z-index: 2147483646;
+            }
+            
+            .chat-robot-icon {
+                font-size: 34px;
+            }
+            
+            .chat-widget {
+                bottom: max(100px, calc(env(safe-area-inset-bottom, 0) + 80px));
+                right: 15px;
+                left: 15px;
+                width: auto;
+                max-width: none;
+                height: 60vh;
+                max-height: 500px;
+            }
+            
+            .chat-manager-message {
+                bottom: 90px;
+                right: 10px;
+                width: 220px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            section {
+                padding: 80px 0;
+            }
+            
+            .hero-title {
+                font-size: 42px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .section-title {
+                font-size: 36px;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .benefit-card {
+                padding: 30px 20px;
+            }
+            
+            .cta-title {
+                font-size: 36px;
+            }
+            
+            .footer-grid {
+                gap: 40px;
+            }
+            
+            .phone-link {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--text-light);
+                text-decoration: none;
+                font-weight: 600;
+                transition: var(--transition);
+            }
+            
+            .phone-link:hover {
+                color: var(--primary-gold);
+            }
+            
+            .investor-image img {
+                height: 300px;
+            }
+            
+            .cars-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .car-image-container {
+                height: 180px;
+            }
+            
+            .car-title {
+                font-size: 17px;
+                height: 2.3em;
+            }
+            
+            .car-specs {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .car-spec {
+                padding: 6px 8px;
+            }
+            
+            .btn-details,
+            .btn-book {
+                font-size: 12px;
+                padding: 6px 10px;
+                height: 30px;
+                min-width: 90px;
+            }
+            
+            .price-amount {
+                font-size: 22px;
+            }
+            
+            .chat-widget-container {
+                bottom: max(15px, env(safe-area-inset-bottom, 15px));
+                right: max(15px, env(safe-area-inset-right, 15px));
+            }
+            
+            .chat-robot-button {
+                width: 70px;
+                height: 70px;
+                position: fixed;
+                bottom: max(20px, env(safe-area-inset-bottom, 20px));
+                right: max(20px, env(safe-area-inset-right, 20px));
+                margin-top: 0;
+                z-index: 2147483646;
+            }
+            
+            .chat-robot-icon {
+                font-size: 32px;
+            }
+            
+            .chat-widget {
+                position: fixed;
+                bottom: max(100px, calc(env(safe-area-inset-bottom, 0) + 80px));
+                right: 15px;
+                left: 15px;
+                width: auto;
+                max-width: none;
+                height: 60vh;
+                max-height: 500px;
+            }
+            
+            .chat-manager-message {
+                bottom: 100px;
+                right: 15px;
+                left: 15px;
+                width: auto;
+            }
+            
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-badge {
+                font-size: 12px;
+                padding: 6px 15px;
+            }
+            
+            .stat-number {
+                font-size: 36px;
+            }
+            
+            .hero-stats {
+                gap: 30px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .btn {
+                padding: 14px 28px;
+                font-size: 14px;
+            }
+            
+            .footer-bottom {
+                text-align: center;
+            }
+            
+            .investor-stat-number {
+                font-size: 28px;
+            }
+            
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .car-image-container {
+                height: 160px;
+            }
+            
+            .car-content {
+                padding: 16px;
+            }
+            
+            .car-title {
+                font-size: 16px;
+                height: 2.2em;
+            }
+            
+            .price-amount {
+                font-size: 20px;
+            }
+            
+            .car-actions {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .btn-details,
+            .btn-book {
+                font-size: 11px;
+                padding: 6px 10px;
+                height: 30px;
+                min-width: 85px;
+            }
+            
+            .cars-filter {
+                gap: 8px;
+            }
+            
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chat-robot-button {
+                width: 64px;
+                height: 64px;
+                bottom: max(15px, env(safe-area-inset-bottom, 15px));
+                right: max(15px, env(safe-area-inset-right, 15px));
+            }
+            
+            .chat-robot-icon {
+                font-size: 30px;
+            }
+            
+            .chat-widget {
+                height: 70vh;
+                bottom: max(90px, calc(env(safe-area-inset-bottom, 0) + 75px));
+            }
+            
+            .chat-manager-message {
+                bottom: 90px;
+            }
+            
+        }
+
+        /* ========== MOBILE MENU ========== */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(320px, 100vw);
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: 1001;
+            padding: max(88px, calc(env(safe-area-inset-top, 0px) + 68px)) max(22px, calc(env(safe-area-inset-right, 0px) + 16px)) max(28px, calc(env(safe-area-inset-bottom, 0px) + 18px)) 32px;
+            transition: right 0.4s ease;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .mobile-nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: color 0.3s ease;
+        }
+
+        .mobile-nav a.active {
+            color: var(--primary-gold);
+        }
+
+        .mobile-nav a:hover {
+            color: var(--primary-gold);
+        }
+
+        .mobile-close {
+            position: absolute;
+            top: max(18px, calc(env(safe-area-inset-top, 0px) + 12px));
+            right: max(12px, calc(env(safe-area-inset-right, 0px) + 8px));
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .mobile-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-phone {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-phone-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    
+
+
+        body.mobile-menu-open .chat-widget-container {
+            pointer-events: none;
+        }
+
+        body.mobile-menu-open .chat-robot-button,
+        body.mobile-menu-open .chat-widget,
+        body.mobile-menu-open .chat-manager-message {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transform: translateY(12px);
+        }
+
+/* ========== CONSULTATION WIDGET OVERRIDES ========== */
+.chat-widget {
+    height: 560px;
+    max-height: 80vh;
+}
+
+.chat-body {
+    padding: 18px;
+    background: var(--primary-dark);
+    overflow-y: auto;
+}
+
+.chat-intro {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.chat-intro-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-gold);
+    margin-bottom: 6px;
+}
+
+.chat-intro-text {
+    font-size: 13px;
+    color: var(--text-gray);
+    line-height: 1.4;
+}
+
+.chat-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.chat-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-gray);
+}
+
+.chat-field-input {
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--text-light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chat-field-input:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.12);
+}
+
+.chat-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.chat-field-social {
+    display: none;
+}
+
+.chat-hint {
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-top: 2px;
+}
+
+.chat-submit-btn {
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(135deg, var(--primary-gold), #B8941F);
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.chat-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.35);
+}
+
+.chat-submit-btn.loading {
+    opacity: 0.7;
+    cursor: wait;
+    box-shadow: none;
+    transform: none;
+}
+
+.chat-success {
+    display: none;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    color: var(--primary-gold-light);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.chat-success.active {
+    display: block;
+}
+
+.chat-privacy {
+    font-size: 11px;
+    color: var(--text-gray);
+    line-height: 1.4;
+}
+
+.chat-robot-button {
+    width: auto;
+    height: 56px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 2px solid rgba(212, 175, 55, 0.35);
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    transition: var(--transition);
+    position: relative;
+    margin-top: 15px;
+    animation: none;
+}
+
+.chat-robot-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+    border-color: var(--primary-gold);
+}
+
+.chat-robot-icon {
+    font-size: 22px;
+    color: var(--primary-gold);
+}
+
+.chat-button-text {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--text-light);
+    text-transform: uppercase;
+}
+
+.chat-widget.active ~ .chat-robot-button {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+}
+
+.chat-manager-message {
+    bottom: 92px;
+}
+
+@media (max-width: 1024px) {
+    .chat-widget {
+        width: 380px;
+        height: 520px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chat-widget-container {
+        left: 0;
+        right: 0;
+        align-items: center;
+    }
+
+    .chat-widget {
+        position: fixed;
+        bottom: 96px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: none;
+        height: 70vh;
+    }
+
+    .chat-manager-message {
+        bottom: 100px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-robot-button {
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+    }
+
+    .chat-button-text {
+        display: none;
+    }
+
+    .chat-widget {
+        height: 74vh;
+        bottom: 88px;
+    }
+
+    .chat-manager-message {
+        bottom: 88px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- ========== HEADER ========== -->
+    <header id="mainHeader">
+        <div class="container header-container">
+            <a href="#home" class="logo" style="display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(212,175,55,0.45); box-shadow: 0 8px 24px rgba(0,0,0,0.3);"><img src="assets/logo-header.png" alt="DAVA RENT CAR" style="height: 46px; width: auto; display: block;"></a>
+            
+            <nav class="nav-desktop">
+                <a href="#home" class="active">Главная</a>
+                <a href="#why">Преимущества</a>
+                <a href="#cars">Автопарк</a>
+                <a href="#process">Как арендовать</a>
+                <a href="#investors">Инвесторам</a>
+                <a href="#contact">Контакты</a>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="btn btn-primary open-booking-modal">Забронировать</button>
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== MOBILE MENU ========== -->
+    <div class="overlay" id="overlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-close" id="mobileClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <nav class="mobile-nav">
+            <a href="#home" class="active">Главная</a>
+            <a href="#why">Преимущества</a>
+            <a href="#cars">Автопарк</a>
+            <a href="#process">Как арендовать</a>
+            <a href="#investors">Инвесторам</a>
+            <a href="#contact">Контакты</a>
+        </nav>
+        <a href="tel:+79409900123" class="mobile-phone">
+            <i class="fas fa-phone"></i>
+            +79409900123
+        </a>
+        <button class="btn btn-primary open-booking-modal mobile-phone-btn">Забронировать</button>
+    </div>
+
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">Премиум-класс</span>
+                <h1 class="hero-title">Аренда эксклюзивных <span class="gold-text">автомобилей</span> в Абхазии</h1>
+                <p class="hero-subtitle">Почувствуйте свободу и статус с нашим парком премиальных автомобилей. Идеальное состояние, полная страховка, индивидуальный сервис.</p>
+                <div class="hero-actions">
+                    <a href="#cars" class="btn btn-primary">Выбрать автомобиль</a>
+                    <a href="#" class="btn btn-secondary open-booking-modal">Оставить заявку</a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="10">0</span>
+                        <span class="stat-label">Автомобилей</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="24">0</span>
+                        <span class="stat-label">Часа поддержки</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="150">0</span>
+                        <span class="stat-label">Довольных клиентов</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== WHY US SECTION ========== -->
+    <section class="why-us" id="why">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Наши преимущества</span>
+                <h2 class="section-title">Почему выбирают <span class="gold-text">DAVA RENT CAR</span></h2>
+                <p class="section-description">Мы предлагаем не просто аренду автомобиля, а премиум-сервис с заботой о каждом клиенте</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3 class="benefit-title">Премиум состояние</h3>
+                    <p class="benefit-desc">Все автомобили обслужены, идеальный внешний вид и чистота.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="benefit-title">Личная страховка</h3>
+                    <p class="benefit-desc">Повреждения до 50.000₽ на весь период аренды.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="benefit-title">Быстрое оформление</h3>
+                    <p class="benefit-desc">Подготовим автомобиль  и договор за 30 минут, любой удобный способ оплаты</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="benefit-title">Поддержка 24/7</h3>
+                    <p class="benefit-desc">Наша служба поддержки работает круглосуточно. Поможем в любой ситуации на дороге</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3 class="benefit-title">Доставка авто</h3>
+                    <p class="benefit-desc">Привезем автомобиль в любую точку Абхазии: аэропорт, отель, адрес</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="benefit-title">Эксклюзивные модели</h3>
+                    <p class="benefit-desc">Уникальные автомобили, которых нет у других прокатчиков в регионе</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CARS SECTION ========== -->
+    <section class="cars-section" id="cars">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Наш автопарк</span>
+                <h2 class="section-title">Выберите свой <span class="gold-text">автомобиль</span></h2>
+                <p class="section-description">Более 10 премиальных автомобилей в наличии. Каждый автомобиль проходит тщательную подготовку и обслуживается ежедневно</p>
+            </div>
+            
+            <div class="cars-filter">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="premium">Премиум</button>
+                <button class="filter-btn" data-filter="sport">Спорт</button>
+                <button class="filter-btn" data-filter="business">Бизнес</button>
+                <button class="filter-btn" data-filter="comfort">Комфорт</button>
+                <button class="filter-btn" data-filter="minivan">Минивэн</button>
+            </div>
+            
+            <div class="cars-grid" id="carsGrid">
+                <!-- Автомобили будут добавлены через JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PROCESS SECTION ========== -->
+    <section class="process" id="process">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Простой процесс</span>
+                <h2 class="section-title">Как арендовать автомобиль</h2>
+                <p class="section-description">Всего 4 шага отделяют вас от управления премиальным автомобилем</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <h3 class="step-title">Выбор автомобиля</h3>
+                    <p class="step-desc">Выберите подходящий автомобиль в нашем каталоге или получите персональную консультацию</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">02</div>
+                    <h3 class="step-title">Оформление заявки</h3>
+                    <p class="step-desc">Заполните онлайн-форму или позвоните нам. Подтвердим бронь в течение 15 минут</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">03</div>
+                    <h3 class="step-title">Подготовка документов</h3>
+                    <p class="step-desc">Отправьте фото прав и паспорта. Подпишем электронный договор без визита в офис</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">04</div>
+                    <h3 class="step-title">Получение автомобиля</h3>
+                    <p class="step-desc">Встретим в удобном месте, проведем инструктаж и передадим ключи от автомобиля</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA SECTION ========== -->
+    <section class="cta">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="cta-title">Не нашли подходящий автомобиль?</h2>
+                <p class="cta-subtitle">Оставьте заявку и мы подберем для вас идеальный вариант с учётом ваших пожеланий и бюджета</p>
+                <div class="hero-actions" style="justify-content: center; margin-top: 40px;">
+                    <a href="#" class="btn btn-primary open-booking-modal">
+                        <i class="fas fa-calendar-alt"></i> Оставить заявку
+                    </a>
+                    <a href="tel:+79409900123" class="btn btn-secondary">
+                        <i class="fas fa-phone"></i> Позвонить сейчас
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== INVESTORS SECTION ========== -->
+    <section class="investors" id="investors">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Для инвесторов</span>
+                <h2 class="section-title">Инвестируйте в <span class="gold-text">роскошный бизнес</span></h2>
+                <p class="section-description">Станьте частью премиального автомобильного бизнеса в Абхазии</p>
+            </div>
+            
+            <div class="investor-content">
+                <div class="investor-text">
+                    <h3 style="font-size: 28px; margin-bottom: 20px;">Присоединяйтесь к успешному проекту</h3>
+                    <p style="color: var(--text-gray); margin-bottom: 30px; line-height: 1.7; font-size: 16px;">
+                        DAVA RENT CAR — это динамично развивающаяся компания в сфере премиальной аренды автомобилей. 
+                        Мы предлагаем уникальную возможность для инвесторов стать частью нашего роста и получить 
+                        стабильный доход от прибыльного бизнеса в одном из самых перспективных туристических регионов.
+                    </p>
+                    <p style="color: var(--text-gray); margin-bottom: 30px; line-height: 1.7; font-size: 16px;">
+                        Наша бизнес-модель доказала свою эффективность: высокая маржинальность, растущий спрос 
+                        на премиальные автомобили и отлаженные операционные процессы. Мы расширяем автопарк и 
+                        открываем новые направления для увеличения доходности.
+                    </p>
+                    
+                    <div class="investor-stats">
+                        <div class="investor-stat">
+                            <div class="investor-stat-number">20%</div>
+                            <div class="investor-stat-label">Ежемесячная доходность</div>
+                        </div>
+                        <div class="investor-stat">
+                            <div class="investor-stat-number">6 месяцев</div>
+                            <div class="investor-stat-label">Окупаемость</div>
+                        </div>
+                        <div class="investor-stat">
+                            <div class="investor-stat-number">1000+</div>
+                            <div class="investor-stat-label">Запрос от клиентов</div>
+                        </div>
+                        <div class="investor-stat">
+                            <div class="investor-stat-number">30%</div>
+                            <div class="investor-stat-label">Загрузка автопарка</div>
+                        </div>
+                    </div>
+                    
+                    <a href="#investors" class="btn btn-primary" style="margin-top: 40px; display: inline-block;">
+                        <i class="fas fa-chart-line"></i> Подробнее для инвесторов
+                    </a>
+                </div>
+                
+                <div class="investor-image">
+                    <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Инвестиции в автобизнес">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html#home" class="footer-logo"><img src="assets/logo-header.png" alt="DAVA RENT CAR" style="height: 46px; width: auto; display: block;"></a>
+                    <p class="footer-desc">
+                        Премиальная аренда автомобилей в Абхазии. Предоставляем эксклюзивные автомобили с безупречным сервисом.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://t.me/davarentcar" class="social-link" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+                        <a href="https://t.me/davarentcar" class="social-link" target="_blank" rel="noopener"><i class="fab fa-telegram"></i></a>
+                        <a href="https://wa.me/79409900123" class="social-link" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Контакты</h3>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>г. Гагра ул. Саят-Нова 50</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>РФ: +79181311123</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>Абхазия: +79409900123</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>iraklidava.projects@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Круглосуточно, 24/7</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Быстрые ссылки</h3>
+                    <div class="footer-links">
+                        <a href="#home">Главная</a>
+                        <a href="#why">Преимущества</a>
+                        <a href="#cars">Автопарк</a>
+                        <a href="#process">Как арендовать</a>
+                        <a href="#investors">Инвесторам</a>
+                        <a href="#contact">Контакты</a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3 class="footer-title">Подписка</h3>
+                    <p class="footer-desc">Подпишитесь на рассылку и получайте первыми информацию о новых автомобилях и специальных предложениях.</p>
+                    <form class="subscribe-form" style="display: flex; gap: 10px; margin-top: 20px;">
+                        <input type="email" placeholder="Ваш email" style="flex: 1; padding: 12px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; color: white; font-family: inherit; font-size: 14px;">
+                        <button type="submit" style="background: var(--primary-gold); color: var(--primary-dark); border: none; width: 46px; height: 46px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2026 DAVA RENT CAR. Все права защищены.</p>
+                <p style="margin-top: 10px; font-size: 13px;">
+                    <a href="privacy.html" style="color: var(--text-gray); text-decoration: none; margin-right: 20px;">Политика конфиденциальности</a>
+                    <a href="#" style="color: var(--text-gray); text-decoration: none;">Договор аренды</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== BOOKING MODAL ========== -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Оставить заявку</h3>
+                <button class="modal-close" id="closeBookingModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-success" id="formSuccess">
+                    <i class="fas fa-check-circle"></i> Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в течение 15 минут.
+                </div>
+                
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="bookingName" class="form-label">Ваше имя *</label>
+                        <input type="text" id="bookingName" class="form-input" placeholder="Иван Иванов" required>
+                        <div class="form-error" id="nameError">Пожалуйста, введите ваше имя</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookingPhone" class="form-label">Телефон *</label>
+                            <input type="tel" id="bookingPhone" class="form-input" placeholder="+7 (___) ___-__-__" required>
+                            <div class="form-error" id="phoneError">Пожалуйста, введите корректный номер телефона</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bookingEmail" class="form-label">Email *</label>
+                            <input type="email" id="bookingEmail" class="form-input" placeholder="example@mail.ru" required>
+                            <div class="form-error" id="emailError">Пожалуйста, введите корректный email</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingCar" class="form-label">Интересующий автомобиль</label>
+                        <select id="bookingCar" class="form-select">
+                            <option value="">Не выбрано</option>
+                            <option value="Porsche Panamera 2020">Porsche Panamera 2020</option>
+                            <option value="Ford Mustang 2020">Ford Mustang 2020</option>
+                            <option value="BMW 430I 2020">BMW 430I 2020</option>
+                            <option value="Toyota Alphard 2020">Toyota Alphard 2020</option>
+                            <option value="Honda Fit 3 2018">Honda Fit 3 2018</option>
+                            <option value="Chevrolet Camaro 2020">Chevrolet Camaro 2020</option>
+                            <option value="Jeep Regenade Trailhawk (серый)">Jeep Regenade Trailhawk (серый)</option>
+                            <option value="Jeep Regenade Trailhawk (бежевый)">Jeep Regenade Trailhawk (бежевый)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookingStart" class="form-label">Дата начала аренды *</label>
+                            <input type="date" id="bookingStart" class="form-input" required>
+                            <div class="form-error" id="startError">Пожалуйста, выберите дату начала аренды</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bookingEnd" class="form-label">Дата окончания аренды *</label>
+                            <input type="date" id="bookingEnd" class="form-input" required>
+                            <div class="form-error" id="endError">Пожалуйста, выберите дату окончания аренды</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingBudget" class="form-label">Бюджет (₽/сутки)</label>
+                        <select id="bookingBudget" class="form-select">
+                            <option value="">Не важно</option>
+                            <option value="10000-20000">10 000 - 20 000 ₽</option>
+                            <option value="20000-30000">20 000 - 30 000 ₽</option>
+                            <option value="30000-40000">30 000 - 40 000 ₽</option>
+                            <option value="40000+">Более 40 000 ₽</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingMessage" class="form-label">Дополнительные пожелания</label>
+                        <textarea id="bookingMessage" class="form-textarea" placeholder="Опишите ваши пожелания к автомобилю..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Отправить заявку
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+<!-- ========== CHAT WIDGET ========== -->
+<div class="chat-widget-container" id="chatWidget">
+    <!-- Сообщение "Менеджер онлайн" -->
+    <div class="chat-manager-message" id="chatManagerMessage">
+        <div class="chat-manager-content">
+            <div class="chat-manager-text">
+                👋 <strong>Нужна консультация?</strong><br>
+                Оставьте контакты — менеджер свяжется с вами
+            </div>
+            <button class="chat-manager-close" id="closeManagerMessage" aria-label="Закрыть подсказку">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-widget" id="chatWindow" aria-hidden="true">
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <div class="chat-avatar">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div>
+                    <h4 class="chat-title">Консультация с менеджером</h4>
+                    <div class="chat-subtitle">
+                        <div class="chat-status">
+                            <span class="status-indicator" id="statusIndicator"></span>
+                            <span id="statusText">Менеджер онлайн</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="chat-close" id="closeChat" aria-label="Закрыть консультацию">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="chat-body">
+            <div class="chat-intro">
+                <div class="chat-intro-title">Подберем авто и условия</div>
+                <div class="chat-intro-text">Оставьте ваши контакты и удобный способ связи — менеджер напишет или позвонит.</div>
+            </div>
+
+            <form class="chat-form" id="consultationForm">
+                <div class="chat-field">
+                    <label class="chat-label" for="consultName">ФИО</label>
+                    <input class="chat-field-input" type="text" id="consultName" name="consultName" placeholder="Иванов Иван" autocomplete="name" required>
+                </div>
+                <div class="chat-field">
+                    <label class="chat-label" for="consultPhone">Номер телефона</label>
+                    <input class="chat-field-input" type="tel" id="consultPhone" name="consultPhone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" required>
+                </div>
+                <div class="chat-field">
+                    <label class="chat-label" for="consultMethod">Способ связи</label>
+                    <div class="chat-select">
+                        <select class="chat-field-input" id="consultMethod" name="consultMethod" required>
+                            <option value="" disabled selected>Выберите способ</option>
+                            <option value="call">Позвонить</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="viber">Viber</option>
+                            <option value="instagram">Instagram</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chat-field chat-field-social" id="socialField">
+                    <label class="chat-label" id="socialLabel" for="consultLink">Ссылка/ник</label>
+                    <input class="chat-field-input" type="text" id="consultLink" name="consultLink" placeholder="https://t.me/username">
+                    <div class="chat-hint" id="socialHint">Укажите ссылку или @ник</div>
+                </div>
+                <div class="chat-field">
+                    <label class="chat-label" for="consultComment">Комментарий (необязательно)</label>
+                    <textarea class="chat-field-input chat-textarea" id="consultComment" name="consultComment" rows="3" placeholder="Например: нужен авто на 3 дня, бюджет до 15 000 ₽/сутки"></textarea>
+                </div>
+                <button type="submit" class="chat-submit-btn" id="consultSubmit">
+                    <i class="fas fa-paper-plane"></i> Отправить заявку
+                </button>
+                <div class="chat-success" id="consultSuccess">Спасибо! Менеджер свяжется с вами в ближайшее время.</div>
+                <div class="chat-privacy">Отправляя заявку, вы соглашаетесь на обработку персональных данных.</div>
+            </form>
+        </div>
+    </div>
+
+    <button class="chat-robot-button chat-consult-button" id="openChat" aria-label="Открыть консультацию" aria-expanded="false">
+        <span class="chat-robot-icon">
+            <i class="fas fa-headset"></i>
+        </span>
+        <span class="chat-button-text">Консультация</span>
+    </button>
+</div>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ========== ОСНОВНОЙ СКРИПТ ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('%c🚗 DAVA RENT CAR', 'font-size: 24px; font-weight: bold; color: #D4AF37;');
+            
+            // Инициализация сайта
+            initSite();
+            
+            // Инициализация чата
+            initChat();
+            
+            // Показываем сообщение о менеджере онлайн
+            showManagerMessage();
+        });
+
+        // ========== ИНИЦИАЛИЗАЦИЯ САЙТА ==========
+        function initSite() {
+            // Мобильное меню
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileClose = document.getElementById('mobileClose');
+            const overlay = document.getElementById('overlay');
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                    overlay.classList.add('active');
+                    document.body.classList.add('mobile-menu-open');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+
+            if (mobileClose) {
+                mobileClose.addEventListener('click', closeMobileMenu);
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', closeMobileMenu);
+            }
+
+            // Скролл хедер
+            const header = document.getElementById('mainHeader');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Модальные окна
+            initModals();
+            
+            // Автомобили
+            initCars();
+            
+            // Статистика
+            initStats();
+            
+            // Формы
+            initForms();
+            
+            // Плавная прокрутка
+            initSmoothScroll();
+            
+            // Активное меню
+            initActiveMenu();
+        }
+
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ЧАТА ==========
+        function initChat() {
+            let socket;
+
+            // Генерация ID пользователя
+            if (!localStorage.getItem('dava_id')) {
+                localStorage.setItem('dava_id', 'u' + Math.random().toString(36).substr(2, 9));
+            }
+            const myId = localStorage.getItem('dava_id');
+
+            const pageLabel = window.location.pathname.split('/').pop() || 'index.html';
+            const carTitleEl = document.querySelector('.car-detail-title');
+            const carLabel = carTitleEl ? carTitleEl.textContent.trim() : 'Главная страница';
+
+            window.davaUserId = myId;
+            window.davaPageLabel = pageLabel;
+            window.davaCarLabel = carLabel;
+
+            // Подключение к серверу
+            try {
+                socket = io(window.location.origin || '', {
+                    query: { userId: myId },
+                    transports: ['websocket', 'polling'],
+                    timeout: 5000
+                });
+
+                // При подключении
+                socket.on('connect', () => {
+                    console.log('✅ Подключено к серверу чата');
+                    updateStatus('Менеджер онлайн', true);
+
+                    const screenRes = `${window.screen.width}x${window.screen.height}`;
+                    socket.emit('init_user', { userName: 'Клиент', screen: screenRes });
+                });
+
+                // При отключении
+                socket.on('disconnect', () => {
+                    console.log('❌ Отключено от сервера чата');
+                    updateStatus('Менеджер офлайн', false);
+                });
+
+                // Ошибка подключения
+                socket.on('connect_error', (error) => {
+                    console.log('❌ Ошибка подключения к чату:', error);
+                    updateStatus('Менеджер офлайн', false);
+                });
+
+            } catch (error) {
+                console.log('❌ Не удалось подключиться к серверу чата:', error);
+                updateStatus('Менеджер офлайн', false);
+            }
+
+            window.davaSocket = socket || null;
+
+            // Элементы виджета
+            const openChatBtn = document.getElementById('openChat');
+            const closeChatBtn = document.getElementById('closeChat');
+            const chatWindow = document.getElementById('chatWindow');
+
+            const form = document.getElementById('consultationForm');
+            const nameInput = document.getElementById('consultName');
+            const phoneInput = document.getElementById('consultPhone');
+            const methodSelect = document.getElementById('consultMethod');
+            const socialField = document.getElementById('socialField');
+            const socialInput = document.getElementById('consultLink');
+            const socialLabel = document.getElementById('socialLabel');
+            const socialHint = document.getElementById('socialHint');
+            const commentInput = document.getElementById('consultComment');
+            const successBox = document.getElementById('consultSuccess');
+            const submitBtn = document.getElementById('consultSubmit');
+
+            const methodLabels = {
+                call: 'Позвонить',
+                whatsapp: 'WhatsApp',
+                telegram: 'Telegram',
+                viber: 'Viber',
+                instagram: 'Instagram'
+            };
+
+            function updateSocialField() {
+                if (!methodSelect || !socialField || !socialInput) return;
+                const method = methodSelect.value;
+                const needsLink = method && method !== 'call';
+                socialField.style.display = needsLink ? 'flex' : 'none';
+                socialInput.required = needsLink;
+                socialInput.disabled = !needsLink;
+
+                if (!needsLink) {
+                    socialInput.value = '';
+                }
+
+                if (socialLabel && socialHint && needsLink) {
+                    socialLabel.textContent = `Ссылка/ник в ${methodLabels[method] || 'соцсети'}`;
+                    socialHint.textContent = 'Укажите ссылку или @ник';
+                }
+            }
+
+            if (methodSelect) {
+                methodSelect.addEventListener('change', updateSocialField);
+                updateSocialField();
+            }
+
+            if (phoneInput) {
+                phoneInput.addEventListener('input', (e) => {
+                    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                    e.target.value = !x[2] ? '+7' + x[1] : '+7 (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+                });
+            }
+
+            // Открытие/закрытие
+            if (openChatBtn) {
+                openChatBtn.addEventListener('click', toggleChat);
+            }
+
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener('click', closeChat);
+            }
+
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    if (successBox) successBox.classList.remove('active');
+
+                    const name = nameInput ? nameInput.value.trim() : '';
+                    const phone = phoneInput ? phoneInput.value.trim() : '';
+                    const method = methodSelect ? methodSelect.value : '';
+                    const methodLabel = methodLabels[method] || 'Не указан';
+                    const link = socialInput ? socialInput.value.trim() : '';
+                    const comment = commentInput ? commentInput.value.trim() : '';
+
+                    if (socialInput) {
+                        if (method && method !== 'call' && !link) {
+                            socialInput.setCustomValidity('Укажите ссылку или ник');
+                        } else {
+                            socialInput.setCustomValidity('');
+                        }
+                    }
+
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    const messageParts = [
+                        '📋 Заявка на консультацию',
+                        `ФИО: ${name || 'Не указано'}`,
+                        `Телефон: ${phone || 'Не указан'}`,
+                        `Способ связи: ${methodLabel}`,
+                        method && method !== 'call' ? `Ссылка/ник: ${link}` : 'Ссылка/ник: не требуется',
+                        comment ? `Комментарий: ${comment}` : null,
+                        `Страница: ${pageLabel}`,
+                        `Авто: ${carLabel}`
+                    ].filter(Boolean);
+
+                    const text = messageParts.join('\n');
+                    const fullId = `${myId}_${(name || 'Клиент').replace(/\s+/g, '_')}`;
+
+                    if (socket && socket.connected) {
+                        const screenRes = `${window.screen.width}x${window.screen.height}`;
+                        socket.emit('init_user', { userName: name || 'Клиент', screen: screenRes });
+                        socket.emit('send_to_admin', {
+                            userId: fullId,
+                            userName: name || 'Клиент',
+                            text: text,
+                            leadType: 'consultation',
+                            car: carLabel,
+                            page: pageLabel
+                        });
+                    }
+
+                    if (successBox) {
+                        successBox.classList.add('active');
+                        successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+
+
+                    form.reset();
+                    updateSocialField();
+                });
+            }
+
+            // Закрытие по Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeChat();
+                }
+            });
+        }
+
+        // ========== ФУНКЦИИ ЧАТА ==========
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const managerMessage = document.getElementById('chatManagerMessage');
+            const openChatBtn = document.getElementById('openChat');
+
+            if (!chatWindow) return;
+
+            if (chatWindow.classList.contains('active')) {
+                closeChat();
+            } else {
+                chatWindow.classList.add('active');
+                chatWindow.setAttribute('aria-hidden', 'false');
+                if (openChatBtn) openChatBtn.setAttribute('aria-expanded', 'true');
+
+                if (managerMessage) {
+                    managerMessage.classList.remove('active');
+                }
+
+                setTimeout(() => {
+                    const nameInput = document.getElementById('consultName');
+                    if (nameInput) nameInput.focus();
+                }, 250);
+            }
+        }
+
+        function closeChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const openChatBtn = document.getElementById('openChat');
+            if (chatWindow) {
+                chatWindow.classList.remove('active');
+                chatWindow.setAttribute('aria-hidden', 'true');
+            }
+            if (openChatBtn) openChatBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function updateStatus(text, isOnline) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+
+            if (statusIndicator && statusText) {
+                statusIndicator.className = isOnline ? 'status-indicator' : 'status-indicator offline';
+                statusText.textContent = text;
+            }
+        }
+
+        function showManagerMessage() {
+            const managerMessage = document.getElementById('chatManagerMessage');
+            const closeManagerBtn = document.getElementById('closeManagerMessage');
+
+            if (!localStorage.getItem('managerMessageClosed')) {
+                setTimeout(() => {
+                    if (managerMessage) {
+                        managerMessage.classList.add('active');
+                    }
+                }, 2000);
+            }
+
+            if (closeManagerBtn) {
+                closeManagerBtn.addEventListener('click', () => {
+                    if (managerMessage) {
+                        managerMessage.classList.remove('active');
+                        localStorage.setItem('managerMessageClosed', 'true');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                if (managerMessage && managerMessage.classList.contains('active')) {
+                    managerMessage.classList.remove('active');
+                }
+            }, 8000);
+        }
+// ========== МОДАЛЬНЫЕ ОКНА ==========
+        function initModals() {
+            const bookingModal = document.getElementById('bookingModal');
+            const closeBookingModal = document.getElementById('closeBookingModal');
+            const openBookingModalBtns = document.querySelectorAll('.open-booking-modal');
+            
+            // Бронирование
+            openBookingModalBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    bookingModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            if (closeBookingModal) {
+                closeBookingModal.addEventListener('click', () => {
+                    bookingModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            
+            // Закрытие по клику вне окна
+            document.addEventListener('click', (e) => {
+                if (bookingModal && e.target === bookingModal) {
+                    bookingModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Закрытие по Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (bookingModal) bookingModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Форма бронирования
+            const bookingForm = document.getElementById('bookingForm');
+            const phoneInput = document.getElementById('bookingPhone');
+            
+            if (phoneInput) {
+                phoneInput.addEventListener('input', (e) => {
+                    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                    e.target.value = !x[2] ? '+7' + x[1] : '+7 (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+                });
+            }
+            
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    let isValid = true;
+                    
+                    // Валидация
+                    const name = document.getElementById('bookingName').value.trim();
+                    if (!name) {
+                        document.getElementById('nameError').classList.add('active');
+                        isValid = false;
+                    } else {
+                        document.getElementById('nameError').classList.remove('active');
+                    }
+                    
+                    const phone = document.getElementById('bookingPhone').value.trim();
+                    const phoneRegex = /^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/;
+                    if (!phone || !phoneRegex.test(phone)) {
+                        document.getElementById('phoneError').classList.add('active');
+                        isValid = false;
+                    } else {
+                        document.getElementById('phoneError').classList.remove('active');
+                    }
+                    
+                    if (isValid) {
+                        const submitBtn = bookingForm.querySelector('.submit-btn');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<div class="loading"></div>';
+                        submitBtn.disabled = true;
+                        
+                        // Собираем данные
+                        const car = document.getElementById('bookingCar').value || 'Не указан';
+                        const startDate = document.getElementById('bookingStart').value || 'Не указана';
+                        const endDate = document.getElementById('bookingEnd').value || 'Не указана';
+                        const dates = `${startDate} - ${endDate}`;
+                        const email = document.getElementById('bookingEmail').value.trim() || 'Не указан';
+                        const budgetSelect = document.getElementById('bookingBudget');
+                        const budget = budgetSelect ? budgetSelect.options[budgetSelect.selectedIndex].text : 'Не важно';
+                        const message = document.getElementById('bookingMessage').value || 'Нет дополнительных пожеланий';
+
+                        const pageLabel = window.davaPageLabel || (window.location.pathname.split('/').pop() || 'index.html');
+                        const baseId = window.davaUserId || localStorage.getItem('dava_id') || 'u' + Math.random().toString(36).slice(2, 8);
+                        const fullId = `${baseId}_${(name || 'Клиент').replace(/\s+/g, '_')}`;
+
+                        const messageParts = [
+                            '🚗 Заявка на аренду',
+                            `Имя: ${name || 'Не указано'}`,
+                            `Телефон: ${phone || 'Не указан'}`,
+                            `Email: ${email || 'Не указан'}`,
+                            `Авто: ${car}`,
+                            `Даты: ${dates}`,
+                            `Бюджет: ${budget || 'Не важно'}`,
+                            message ? `Комментарий: ${message}` : null,
+                            `Страница: ${pageLabel}`
+                        ].filter(Boolean);
+
+                        const leadText = messageParts.join('\n');
+                        const socketRef = window.davaSocket;
+                        if (socketRef) {
+                            const screenRes = `${window.screen.width}x${window.screen.height}`;
+                            socketRef.emit('init_user', { userName: name || 'Клиент', screen: screenRes });
+                            socketRef.emit('send_to_admin', {
+                                userId: fullId,
+                                userName: name || 'Клиент',
+                                text: leadText,
+                                leadType: 'booking',
+                                car,
+                                page: pageLabel,
+                                dates,
+                                budget
+                            });
+                        }
+                        
+                        // Имитация отправки
+                        setTimeout(() => {
+                            const formSuccess = document.getElementById('formSuccess');
+                            if (formSuccess) {
+                                formSuccess.classList.add('active');
+                            }
+                            
+                            // Сброс формы через 3 секунды
+                            setTimeout(() => {
+                                bookingForm.reset();
+                                if (formSuccess) {
+                                    formSuccess.classList.remove('active');
+                                }
+                                
+                                bookingModal.classList.remove('active');
+                                document.body.style.overflow = 'auto';
+                            }, 3000);
+                            
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }, 1500);
+                    }
+                });
+            }
+        }
+
+        // ========== АВТОМОБИЛИ ==========
+        function initCars() {
+            const allCars = [
+                {
+                    id: 1,
+                    title: "Porsche Panamera 2020",
+                    filter: "premium",
+                    image: "assets/porsche-panamera-2020.jpg",
+                    price: "20 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "330 л.с." },
+                        { icon: "fas fa-rocket", value: "3.8 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "10.5 л" }
+                    ],
+                    url: "porsche-panamera-2020.html"
+                },
+                {
+                    id: 2,
+                    title: "BMW 430I 2020",
+                    filter: "premium",
+                    image: "assets/bmw-430i-2020.jpg",
+                    price: "10 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "258 л.с." },
+                        { icon: "fas fa-rocket", value: "5.5 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "8.5 л" }
+                    ],
+                    url: "bmw-430i-2020.html"
+                },
+                {
+                    id: 4,
+                    title: "Ford Mustang 2020",
+                    filter: "sport",
+                    image: "assets/ford-mustang-2020.jpg",
+                    price: "10 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "310 л.с." },
+                        { icon: "fas fa-rocket", value: "4.3 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "11.5 л" }
+                    ],
+                    url: "ford-mustang-2020.html"
+                },
+                {
+                    id: 5,
+                    title: "Toyota Alphard 2020",
+                    filter: "minivan",
+                    image: "assets/toyota-alphard-2020.jpg",
+                    price: "10 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "301 л.с." },
+                        { icon: "fas fa-rocket", value: "9.6 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "9.8 л" }
+                    ],
+                    url: "toyota-alphard-2020.html"
+                },
+                {
+                    id: 7,
+                    title: "Honda Fit 3 2018 (голубая)",
+                    filter: "comfort",
+                    image: "assets/honda-fit-2018-gray.jpg",
+                    price: "5 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "102 л.с." },
+                        { icon: "fas fa-rocket", value: "10.2 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "6.1 л" }
+                    ],
+                    url: "honda-fit-2018-gray.html"
+                },
+                {
+                    id: 8,
+                    title: "Honda Fit 3 2018 (черная)",
+                    filter: "comfort",
+                    image: "assets/honda-fit-2018-black.jpg",
+                    price: "5 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "102 л.с." },
+                        { icon: "fas fa-rocket", value: "10.2 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "6.1 л" }
+                    ],
+                    url: "honda-fit-2018-black.html"
+                },
+                {
+                    id: 9,
+                    title: "Chevrolet Camaro 2020",
+                    filter: "sport",
+                    image: "assets/chevrolet-camaro-2020.jpg",
+                    price: "10 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "238 л.с." },
+                        { icon: "fas fa-rocket", value: "4.0 сек" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "11.2 л" }
+                    ],
+                    url: "chevrolet-camaro-2020.html"
+                },
+                {
+                    id: 10,
+                    title: "Jeep Regenade Trailhawk (серый)",
+                    filter: "comfort",
+                    image: "assets/JeepRegenadeTrailhawkGray.jpg",
+                    price: "6 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "184 л.с." },
+                        { icon: "fas fa-rocket", value: "н/д" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "н/д" }
+                    ],
+                    url: "jeep-regenade-trailhawk-gray.html"
+                },
+                {
+                    id: 11,
+                    title: "Jeep Regenade Trailhawk (бежевый)",
+                    filter: "comfort",
+                    image: "assets/JeepRegenadeTrailhawkWhite.jpg",
+                    price: "6 000",
+                    specs: [
+                        { icon: "fas fa-tachometer-alt", value: "184 л.с." },
+                        { icon: "fas fa-rocket", value: "н/д" },
+                        { icon: "fas fa-cog", value: "Автомат" },
+                        { icon: "fas fa-gas-pump", value: "н/д" }
+                    ],
+                    url: "jeep-regenade-trailhawk-white.html"
+                },
+            ];
+
+            const carsGrid = document.getElementById('carsGrid');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            function renderCars(filter = 'all') {
+                if (!carsGrid) return;
+                
+                carsGrid.innerHTML = '';
+                
+                const filteredCars = filter === 'all' 
+                    ? allCars 
+                    : allCars.filter(car => car.filter === filter);
+                
+                filteredCars.forEach((car, index) => {
+                    const carCard = document.createElement('div');
+                    carCard.className = 'car-card';
+                    carCard.dataset.filter = car.filter;
+                    carCard.style.animationDelay = `${index * 0.1}s`;
+                    
+                    carCard.innerHTML = `
+                        <div class="car-image-container">
+                            <img src="${car.image}" alt="${car.title}" class="car-image" loading="lazy"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMGEwYTBhIi8+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjIyNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj4KICAgICAgICBEQVZBIEFVVE8KICAgIDwvdGV4dD4KPC9zdmc+';">
+                        </div>
+                        <div class="car-content">
+                            <h3 class="car-title">${car.title}</h3>
+                            
+                            <div class="car-specs">
+                                ${car.specs.map((spec, index) => `
+                                    <div class="car-spec">
+                                        <i class="${spec.icon}"></i>
+                                        <div>
+                                            <span>${spec.value}</span>
+                                            <span class="car-spec-label">${index === 0 ? 'Мощность' : 
+                                                                           index === 1 ? '0-100 км/ч' : 
+                                                                           index === 2 ? 'Коробка' : 
+                                                                           'Расход'}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="car-footer">
+                                <div class="car-price">
+                                    <div class="price-amount">${car.price}</div>
+                                    <div class="price-period">₽ / сутки</div>
+                                </div>
+                                <div class="car-actions">
+                                    <a href="${car.url}" class="btn-details">
+                                        <i class="fas fa-eye"></i> Подробнее
+                                    </a>
+                                    <button class="btn-book open-booking-modal" data-car="${car.title}">
+                                        <i class="fas fa-calendar-alt"></i> Забронировать
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    carsGrid.appendChild(carCard);
+                    
+                    // Добавляем обработчик для кнопки бронирования
+                    const bookBtn = carCard.querySelector('.btn-book');
+                    if (bookBtn) {
+                        bookBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            document.getElementById('bookingCar').value = car.title;
+                            document.getElementById('bookingModal').classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        });
+                    }
+                });
+            }
+
+            if (filterBtns.length > 0) {
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        renderCars(btn.dataset.filter);
+                    });
+                });
+            }
+
+            renderCars();
+        }
+
+        // ========== СТАТИСТИКА ==========
+        function initStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            
+            if (statNumbers.length === 0) return;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateStats();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            const statsSection = document.querySelector('.hero-stats');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+        }
+
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            
+            statNumbers.forEach(stat => {
+                const target = parseInt(stat.getAttribute('data-count'));
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        stat.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current);
+                    }
+                }, 16);
+            });
+        }
+
+        // ========== ФОРМЫ ==========
+        function initForms() {
+            const subscribeForms = document.querySelectorAll('.subscribe-form');
+            subscribeForms.forEach((form) => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = form.querySelector('input[type="email"]');
+                    const email = input ? input.value.trim() : '';
+
+                    if (!email) {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Введите email для подписки', 'error');
+                        }
+                        return;
+                    }
+
+                    try {
+                        const page = window.location.pathname.split('/').pop() || 'index.html';
+                        const response = await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, page })
+                        });
+                        const data = await response.json().catch(() => ({}));
+
+                        if (response.ok && data.ok) {
+                            if (typeof showNotification === 'function') {
+                                const msg = data.duplicate ? 'Вы уже подписаны' : 'Спасибо! Подписка оформлена';
+                                showNotification(msg, 'success');
+                            }
+                            form.reset();
+                        } else {
+                            if (typeof showNotification === 'function') {
+                                showNotification(data.message || 'Ошибка сохранения', 'error');
+                            }
+                        }
+                    } catch (error) {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Ошибка сети. Попробуйте позже.', 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        // ========== ПЛАВНАЯ ПРОКРУТКА ==========
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        closeMobileMenu();
+                    }
+                });
+            });
+        }
+
+        // ========== АКТИВНОЕ МЕНЮ ==========
+        function initActiveMenu() {
+            window.addEventListener('scroll', () => {
+                const scrollPos = window.scrollY + 100;
+                const sections = document.querySelectorAll('section[id]');
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        document.querySelectorAll('.nav-desktop a, .mobile-nav a').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${sectionId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            
+            if (mobileMenu) mobileMenu.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.classList.remove('mobile-menu-open');
+            document.body.style.overflow = 'auto';
+        }
+
+        // ========== УТИЛИТЫ ==========
+        function showNotification(text, type = 'info') {
+            // Создаем уведомление
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                border-radius: 8px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease-out;
+                max-width: 300px;
+                font-size: 14px;
+            `;
+            
+            notification.textContent = text;
+            document.body.appendChild(notification);
+            
+            // Удаляем через 3 секунды
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
